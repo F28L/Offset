@@ -42,15 +42,21 @@ def get_user(conn, email):
     except Error as e:
         print(e)
 
-def add_package_number(conn, email, tracking):
+def add_package(conn, email, tracking, weight, length, 
+                width, height, volume, origin, ship_date, destination, 
+                distance, transportation, carbon):
     try:
         c = conn.cursor()
         values = (email,)
         sql = ''' SELECT id FROM users where email = ?'''
         c.execute(sql,values)
         key = c.fetchall()
-        values = (email, key[0][0], tracking)
-        sql = ''' INSERT INTO packages(email,user_id,tracking) VALUES(?,?,?) '''
+        values = (email, key[0][0], tracking, weight, length, 
+                width, height, volume, origin, ship_date, destination, 
+                distance, transportation, carbon)
+        sql = ''' INSERT INTO packages(email,user_id,tracking,weight,
+                length,width,height,volume, origin, ship_date, destination, 
+                distance, transportation, carbon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
         c.execute(sql,values)
         conn.commit()
     except Error as e:
@@ -76,8 +82,6 @@ def main():
                                         user_id integer,
                                         tracking integer,
                                         weight real,
-                                        weight_unit text,
-                                        dimension_unit,
                                         length real,
                                         width real,
                                         height real,
@@ -85,6 +89,7 @@ def main():
                                         origin text,
                                         ship_date text,
                                         destination text,
+                                        distance real,
                                         transportation text,
                                         carbon real,
                                         FOREIGN KEY (user_id) REFERENCES users (id)
@@ -94,7 +99,8 @@ def main():
     if conn is not None:
         create_table(conn, user_table)
         create_table(conn, package_table)
-        add_package_number(conn, "tmgiewont@gmail.com", 69)
+        add_user(conn, "Thomas Giewont", "tmgiewont@gmail.com")
+        add_package(conn, "tmgiewont@gmail.com", 69, 10, 2,2,2, 8, "Albany, New York", "2021-04-10", "College Park, Maryland", 250, "road", 69)
         #print(get_user(conn,"tmgiewont@gmail.com"))
     else:
         print("You fucked up")
