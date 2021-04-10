@@ -11,6 +11,10 @@ def home():
 def test():
     return render_template('test.html')
 
+@app.route('/profile', methods=['GET'])
+def profile():
+    return render_template('profile.html')
+
 
 
 if __name__ == "__main__":
