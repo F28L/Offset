@@ -1,0 +1,15 @@
+{
+    "id": "100100", 
+    "user_id": "100100", 
+    "tracking": "100100", 
+    "weight": 10.2, 
+    "length": 0.5, 
+    "width": 0.5, 
+    "height": 0.5, 
+    "volume": 0.125, 
+    "origin": "New York City, NY", 
+    "ship_date": "2020-11-05", 
+    "destination": "Seoul, South Korea", 
+    "transportation": "plane", 
+    "carbon": 102
+}

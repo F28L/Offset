@@ -1,3 +1,7 @@
+body {
+    overflow: hidden;
+}
+
 #logo-container {
     position: absolute; 
     width: 20%;

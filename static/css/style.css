@@ -8,11 +8,9 @@
 body {
     background-color: var(--background);
     margin: 0;
-    overflow: hidden;
     font-family: "Alef", Helvetica;
     font-size: 30px;
     font-style: normal;
     font-weight: 400;
     color: var(--primary);
 }
-
