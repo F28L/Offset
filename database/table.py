@@ -1,4 +1,5 @@
 import sqlite3
+import json
 from sqlite3 import Error
 
 def create_connection(db_file):
@@ -18,6 +19,43 @@ def create_table(conn, create_table_sql):
     except Error as e:
         print(e)
 
+def add_user(conn, name, email):
+    try:
+        c = conn.cursor()
+        values = (name, email)
+        sql = ''' INSERT INTO users(name,email) VALUES(?,?) '''
+        c.execute(sql,values)
+        conn.commit()
+    except Error as e:
+        print(e)
+
+def get_user(conn, email):
+    try:
+        c = conn.cursor()
+        values = (email,)
+        sql = ''' SELECT * FROM users where email = ?'''
+        c.execute(sql,values)
+        data = c.fetchall()
+        names = list(map(lambda x: x[0], c.description))
+        dic = {names[i]: data[0][i] for i in range(len(names))}
+        return dic
+    except Error as e:
+        print(e)
+
+def add_package_number(conn, email, tracking):
+    try:
+        c = conn.cursor()
+        values = (email,)
+        sql = ''' SELECT id FROM users where email = ?'''
+        c.execute(sql,values)
+        key = c.fetchall()
+        values = (email, key[0][0], tracking)
+        sql = ''' INSERT INTO packages(email,user_id,tracking) VALUES(?,?,?) '''
+        c.execute(sql,values)
+        conn.commit()
+    except Error as e:
+        print(e)
+
 def main():
     database = "offsetlite.db"
 
@@ -34,6 +72,7 @@ def main():
     # date of shipment, destination(ship to address), transportation( Type of shipment road, air,etc), calculated carbon  
     package_table = """ CREATE TABLE IF NOT EXISTS packages (
                                         id integer PRIMARY KEY,
+                                        email text,
                                         user_id integer,
                                         tracking integer,
                                         weight real,
@@ -55,6 +94,8 @@ def main():
     if conn is not None:
         create_table(conn, user_table)
         create_table(conn, package_table)
+        add_package_number(conn, "tmgiewont@gmail.com", 69)
+        #print(get_user(conn,"tmgiewont@gmail.com"))
     else:
         print("You fucked up")
 

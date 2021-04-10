@@ -8,6 +8,7 @@
 
 ## Packages Tables
 * id : Unique id
+* email: Email of the user
 * user_id : Unique id of the user this package belongs to
 * tracking : Tracking number of the package
 * weight : weight of the package
@@ -18,7 +19,7 @@
 * height : Height of package  
 * volume : volume of the package
 * origin : Where the package is being shipped from
-* ship_date : When the package was shipped
+* ship_date : When the package was shipped (YYY-MM-DD)
 * destination : Where the package is being shipped to
 * transportation : Type of transportation the package is using (road, plane, etc)
 * carbon : carbon output of table
