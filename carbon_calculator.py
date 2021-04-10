@@ -100,4 +100,6 @@ def getMileage(zip1, zip2, kg, cbm):
 
     breakdown = shortestRoute(zip1, zip2)
     grams = getCO2(coords1, coords2, breakdown, kg, cbm)
+    
+    return grams #kgCO2
 
