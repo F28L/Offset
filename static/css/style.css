@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css?family=Alef:400');
+
+:root {
+    --background: #b0c5b2;
+    --primary: #364751;
+}
+
+body {
+    background-color: var(--background);
+    margin: 0;
+    overflow: hidden;
+    font-family: "Alef", Helvetica;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 400;
+    color: var(--primary);
+}
+
