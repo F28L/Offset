@@ -1,9 +1,11 @@
 import requests
 
+MAPS_API_KEY = 'put api key here'
+
 def getCoordsFromZip(zip_code):
     qs = {
         'address':zip_code,
-        'key':'AIzaSyB1uoqMgF_qCnQcqfffcHKGM8t9Xn1miNo'
+        'key':MAPS_API_KEY
     }
     
     r = requests.get(url='https://maps.googleapis.com/maps/api/geocode/json', params=qs)
@@ -92,9 +94,10 @@ def getCO2(origin, dest, breakdown, kgs, cbm):
 
     return j['scenario']['legs'][0]['total_co2']
 
-northbrook = getCoordsFromZip('60062')
-cp = getCoordsFromZip('20742')
+def getMileage(zip1, zip2, kg, cbm):
+    coords1 = getCoordsFromZip(zip1)
+    coords2 = getCoordsFromZip(zip2)
 
-breakdown = shortestRoute(northbrook, cp)
-grams = getCO2(northbrook, cp, breakdown, 1, 0.1)
+    breakdown = shortestRoute(zip1, zip2)
+    grams = getCO2(coords1, coords2, breakdown, kg, cbm)
 
