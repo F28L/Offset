@@ -1,7 +1,8 @@
+import time
 import requests
 
 API_KEY = 'TEST_Z1JCbxbL+lc+1FPHN5WQOFq3uLr5pjLYlzJym6sjm+g'
-GOOGLE_MAPS_KEY = 'AIzaSyBQ86CvVJmcPksfusTgLaijoLq-deRsFmY'
+GOOGLE_MAPS_KEY = 'AIzaSyASaCcOQ1rrK7XHbREi4Xqrek4t4L5r0Nk'
 
 def getZip(latitude, longitude):
     qs = {
@@ -19,6 +20,7 @@ def getZip(latitude, longitude):
             return a['long_name']
 
 def getDetails(carrier, tracking):
+    time.sleep(0.5)
     qs = {
         'carrier_code':carrier,
         'tracking_number':tracking
@@ -38,7 +40,7 @@ def getDetails(carrier, tracking):
 
     print(f'LUCAS {carrier}')
     if carrier == 'ups':
-        if j['carrier_status_description'] != "Invalid tracking number":
+        if j['carrier_status_code'] and len(j['events']) > 1:
             firstevent = j['events'][-2] # First event is label printing, need to grab origin scan.
             origincity = firstevent['city_locality']
             originstate = firstevent['state_province']
@@ -71,7 +73,7 @@ def getDetails(carrier, tracking):
             }
 
     elif carrier == 'usps':
-        if j['carrier_status_code'] != "-2147219283":
+        if j['carrier_detail_code']:
             firstevent = j['events'][-1] 
             origincity = firstevent['city_locality']
             originstate = firstevent['state_province']

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 import json
 
 import math
@@ -17,18 +17,18 @@ def home():
 def test():
     return render_template('test.html')
 
-@app.route('/profile', methods=['GET'])
-def profile():
-    #  takes a user json
-    userid = request.headers['useremail']
+# @app.route('/profile', methods=['GET'])
+# def profile():
+#     #  takes a user json
+#     userid = request.headers['useremail']
 
-    conn = table.open_connection()
-    usr = table.get_user(conn, userid)
-    pkg = table.get_packages(conn, userid)
+#     conn = table.open_connection()
+#     usr = table.get_user(conn, userid)
+#     pkg = table.get_packages(conn, userid)
 
-    conn.close()
+#     conn.close()
 
-    return render_template('profile.html', user=usr, packages=pkg)
+#     return render_template('profile.html', user=usr, packages=pkg)
 
 @app.route('/loading')
 def load(): 
@@ -38,11 +38,10 @@ def load():
     # get json data 
     return render_template('loading.html')
 
-@app.route('/login')
+@app.route('/profile')
 def login(): 
     gmuser = gmail.getDataFromEmailInbox()
     conn = table.open_connection()
-    
     user = table.get_user(conn, gmuser['email'])
     if not user : 
         table.add_user(conn, gmuser['name'], gmuser['email'])
@@ -57,17 +56,20 @@ def login():
         # kg, cbm = dummy
         kg = 2
         cbm = 0.2
-        lwh = math.sqrt(cmb)
+        lwh = math.sqrt(cbm)
         carbon = carbon_calculator.getCO2(coord_str(details['origin']), coord_str(details['destination']), breakdown, kg, cbm)
-
-        table.add_package(conn, user['email'], track, kg, lwh, lwh, lwh, cbm, f"{details['origin']['city']}, {details['origin']['state']}", '2021-11-04', f"{details['destination']['city']}, {details['destination']['state']}", breakdown['distance'], 'road', carbon)
+    
+        table.add_package(conn, gmuser['email'], track, kg, lwh, lwh, lwh, cbm, f"{details['origin']['city']}, {details['origin']['state']}", '2021-11-04', f"{details['destination']['city']}, {details['destination']['state']}", breakdown['main']['distance'], 'road', carbon)
         
+    table.update_user(conn, gmuser['email'])
+
+    usr = table.get_user(conn, gmuser['email'])
+    pkg = table.get_packages(conn, gmuser['email'])
+
 
     conn.close()
 
-    response = redirect(url_for('profile'))
-    response.headers = {'useremail': user['email']}  
-    return response
+    return render_template('profile.html', user=usr, packages=pkg)
 
 def coord_str(location): 
     return f"{location['longitude']},{location['latitude']}"

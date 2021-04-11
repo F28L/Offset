@@ -1,0 +1,22 @@
+body {
+    overflow: hidden;
+}
+
+#logo-container {
+    position: absolute; 
+    width: 20%;
+    left: 40%;
+    top: 15%;
+}
+
+#logo-container img {
+    width: 100%;
+}
+
+#message {
+    position: absolute; 
+    left:0;
+    right:0;
+    top: 50%;
+    text-align: center;
+}

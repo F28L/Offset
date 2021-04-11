@@ -5,6 +5,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 
+import datetime
 
 # import the required libraries
 from googleapiclient.discovery import build
@@ -90,7 +91,10 @@ def getDataFromEmailInbox():
     data_dict['email'] = profile['emailAddress']
 
     # # We can also pass maxResults to get any number of emails. Like this:
-    result = service.users().messages().list(maxResults=10000, userId='me', q ='"tracking number"').execute()
+    t_minus120 = datetime.datetime.today() - datetime.timedelta(120)
+    date_time = t_minus120.strftime("%Y/%m/%d/")
+
+    result = service.users().messages().list(maxResults=10000, userId='me', q = 'after:' + date_time + ' "tracking number"').execute()
     messages = result.get('messages')
 
     # messages is a list of dictionaries where each dictionary contains a message id.
@@ -121,7 +125,7 @@ def getDataFromEmailInbox():
                 data = payload['body']['data']
             else:
                 data = payload['parts'][0]['body']['data']
-            
+            # print(data, sender)
             data = data.replace("-","+").replace("_","/")
             decoded_data = base64.b64decode(data)
 
@@ -129,7 +133,7 @@ def getDataFromEmailInbox():
             packages += res
 
         except Exception as e:
-            print(e, 'error')
+            # print(e, 'error')
             pass
         
     data_dict['packages'] = list(set(packages))

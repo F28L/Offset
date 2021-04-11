@@ -34,7 +34,7 @@ def add_user(conn, name, email):
     try:
         c = conn.cursor()
         values = (name, email)
-        sql = ''' INSERT INTO users(name,email) VALUES(?,?) ON CONFLICT IGNORE'''
+        sql = ''' INSERT INTO users(name,email) VALUES(?,?)'''
         c.execute(sql,values)
         conn.commit()
     except Error as e:
@@ -97,7 +97,7 @@ def add_package(conn, email, tracking, weight, length,
                 distance, transportation, carbon)
         sql = ''' INSERT INTO packages(tracking,email,weight,
                 length,width,height,volume, origin, ship_date, destination, 
-                distance, transportation, carbon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT REPLACE'''
+                distance, transportation, carbon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'''
         c.execute(sql,values)
         conn.commit()
     except Error as e:
@@ -113,7 +113,7 @@ def add_packages(conn, email, packages):
                     p['distance'], p['transportation'], p['carbon'])
             sql = ''' INSERT INTO packages(tracking,email,weight,
                     length,width,height,volume, origin, ship_date, destination, 
-                    distance, transportation, carbon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT REPLACE'''
+                    distance, transportation, carbon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'''
             c.execute(sql,values)
         conn.commit()
     except Error as e:
@@ -148,8 +148,7 @@ def main():
                                         destination text,
                                         distance real,
                                         transportation text,
-                                        carbon real,
-                                        FOREIGN KEY (user_id) REFERENCES users (id)
+                                        carbon real
                                     ); """
 
     conn = create_connection(database)
@@ -165,5 +164,7 @@ def main():
         print("You messed up")
 
 if __name__ == '__main__':
+    conn = open_connection()
+    clear(conn)
+    conn.close() 
     main()
-    

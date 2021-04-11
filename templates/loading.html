@@ -1,0 +1,23 @@
+<html>
+	<head>
+		<title>Offset</title>
+
+		<link rel="stylesheet" type="text/css" href="static/css/style.css">
+		<link rel="stylesheet" type="text/css" href="static/css/loading.css">
+	</head>
+	<body>
+		<div id="logo-container">
+			<img src="/static/img/logo.png">
+		</div>
+		
+		
+		<div id="message">Loading...</div>
+
+		<script>
+			array = ["Well This Is Taking Longer Than Expected...", "Magically Finding Tracking Numbers...", "Calculating Santa’s Carbon Footprint...", "Looking At The Clouds...", "Oh Man Its 2am...",  "Take This Time To Call Your Mother...", "I Swear This Never Happens...", "I Need Sleep...",  "Hope This Is Worth The Wait....", "I Hope Elon Musk Sees This..."]
+			setInterval(function(){ document.getElementById("message").textContent = array[Math.floor(Math.random() * array.length)];}, 3000);
+		</script>
+		<script> window.location.replace('/profile'); </script>
+
+	</body>
+</html>
