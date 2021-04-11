@@ -27,7 +27,6 @@
 	<div class="package-container">
 		<table class="packages">
 			<tr>
-				<th>Date Shipped: </th>
 				<th>Tracking Number:</th>
 				<th>Weight:</th>
 				<th>Volume:</th>
@@ -38,7 +37,6 @@
 			</tr>
 		{% for p in packages %}
 			<tr class="package">
-				<th>{{ p.ship_date }}</th>
 				<th>{{ p.tracking }}</th>
 				<th>{{ p.weight }} kg</th>
 				<th>{{ p.volume }} m^3</th>
