@@ -20,6 +20,10 @@ def profile():
     #  takes a user json
     userid = request.headers['userid']
 
+    conn = table.open_connection()
+    usr = table.get_user(conn, userid)
+    pkg = table.get_packages(conn, userid)
+
     usr="""{
     "id": "110110", 
     "name": "Thomas", 
@@ -89,23 +93,23 @@ def load():
 def login(): 
     usr = gmail.get_tracking_numbers()
     conn = table.open_connection()
-    table.add_user(conn, usr.name, usr.email)
+    
+    usr = table.get_user(conn, user.email)
+    if not usr: 
+        table.add_user(conn, usr.name, usr.email)
+    
+    # get package info
 
+
+    # put packages
+    table.add_packages(conn, usr.email, pkg)
     
 
     conn.close()
-    return redirect(url_for('login'))
+    return redirect(url_for('profile'))
 
 # if user exists, just scrape
 # otherwise, add
-
-
-# def scrape(): 
-    # call gmail api scrape
-    # get the info as json
-    # save to db all the packages. 
-
-    # recalculate user statistics
 
 if __name__ == "__main__":
     app.run(debug=True)

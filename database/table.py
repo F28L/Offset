@@ -34,7 +34,7 @@ def add_user(conn, name, email):
     try:
         c = conn.cursor()
         values = (name, email)
-        sql = ''' INSERT INTO users(name,email) VALUES(?,?) '''
+        sql = ''' INSERT INTO users(name,email) VALUES(?,?) ON CONFLICT IGNORE'''
         c.execute(sql,values)
         conn.commit()
     except Error as e:
@@ -88,17 +88,29 @@ def add_package(conn, email, tracking, weight, length,
                 distance, transportation, carbon):
     try:
         c = conn.cursor()
-        values = (email,)
-        sql = ''' SELECT id FROM users where email = ?'''
-        c.execute(sql,values)
-        key = c.fetchall()
-        values = (email, key[0][0], tracking, weight, length, 
+        values = (tracking, email weight, length, 
                 width, height, volume, origin, ship_date, destination, 
                 distance, transportation, carbon)
-        sql = ''' INSERT INTO packages(email,user_id,tracking,weight,
+        sql = ''' INSERT INTO packages(tracking,email,weight,
                 length,width,height,volume, origin, ship_date, destination, 
-                distance, transportation, carbon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
+                distance, transportation, carbon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT REPLACE'''
         c.execute(sql,values)
+        conn.commit()
+    except Error as e:
+        print(e)
+
+def add_packages(conn, email, packages): 
+    # where packages is an array of dicts with necessary information
+    try:
+        c = conn.cursor()
+        for p in packages: 
+            values = (p['tracking'], p['email'] p['weight'], p['length'], 
+                    p['width'], p['height'], p['volume'], p['origin'], p['ship_date'], p['destination'], 
+                    p['distance'], p['transportation'], p['carbon'])
+            sql = ''' INSERT INTO packages(tracking,email,weight,
+                    length,width,height,volume, origin, ship_date, destination, 
+                    distance, transportation, carbon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT REPLACE'''
+            c.execute(sql,values)
         conn.commit()
     except Error as e:
         print(e)
@@ -120,10 +132,8 @@ def main():
     #Every package has its tracking number, weight, volume, origin(ship from address), 
     # date of shipment, destination(ship to address), transportation( Type of shipment road, air,etc), calculated carbon  
     package_table = """ CREATE TABLE IF NOT EXISTS packages (
-                                        id integer PRIMARY KEY,
+                                        tracking text PRIMARY KEY,
                                         email text,
-                                        user_id integer,
-                                        tracking text,
                                         weight real,
                                         length real,
                                         width real,
