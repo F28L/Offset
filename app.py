@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request
 import json
 
-from utils import gmail, carbon_calculator, package_parser
+import math
+
+from utils import gmail, carbon_calculator, package_parser, shipengine
 from database import table
 
 app = Flask(__name__)
@@ -18,7 +20,7 @@ def test():
 @app.route('/profile', methods=['GET'])
 def profile():
     #  takes a user json
-    userid = request.headers['userid']
+    userid = request.headers['useremail']
 
     conn = table.open_connection()
     usr = table.get_user(conn, userid)
@@ -96,17 +98,29 @@ def login():
     
     usr = table.get_user(conn, user.email)
     if not usr: 
-        table.add_user(conn, usr.name, usr.email)
+        table.add_user(conn, usr['name'], usr['email'])
     
     # get package info
+    for (carrier, track) in usr['packages']: 
+        details = shipengine.getDetails(carrier, track)
+        breakdown = carbon_calculator.shortestRoute(coord_str(details['origin']), coord_str(details['destination']))
+        # kg, cbm = dummy
+        kg = 2
+        cbm = 0.2
+        lwh = math.sqrt(cmb)
+        carbon = carbon_calculator.getCO2(coord_str(details['origin']), coord_str(details['destination']), breakdown, kg, cbm)
 
-
-    # put packages
-    table.add_packages(conn, usr.email, pkg)
-    
+        table.add_package(conn, usr['email'], track, kg, lwh, lwh, lwh, cbm, f"{details['origin']['city']}, {details['origin']['state']}", '2021-11-04', f"{details['destination']['city']}, {details['destination']['state']}", breakdown['distance'], 'road', carbon)
+        
 
     conn.close()
-    return redirect(url_for('profile'))
+
+    response = redirect(url_for('profile'))
+    response.headers = {'useremail': user['email']}  
+    return response
+
+def coord_str(location): 
+    return f"{location['longitude']},{location['latitude']}"
 
 # if user exists, just scrape
 # otherwise, add
