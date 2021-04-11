@@ -20,7 +20,7 @@
       <tr>
         <th>Total Packages: {{ user.total_packages }}</th>
         <th>Total Miles Delivered: {{ user.total_miles }}</th>
-        <th>Total Carbon: {{ user.total_carbon }}</th>
+        <th>Total Carbon (gC02): {{ user.total_carbon }}</th>
       </tr>
     </table>
 	<h2>Packages</h2>
@@ -43,7 +43,7 @@
 				<th>{{ p.origin }}</th>
 				<th>{{ p.destination }}</th>
 				<th>{{ p.transportation }}</th>
-				<th>{{ p.carbon }} kgCo2</th>
+				<th>{{ p.carbon }} gCo2</th>
 			</tr>
 		{% endfor %}
 		</table>
