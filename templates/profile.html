@@ -11,8 +11,12 @@
     <link href="/static/css/profile.css" rel="stylesheet" />
   </head>
   <body>
+	<div id="logo-container">
+		<img src="/static/img/logo.png">
+	</div>
+	
     <h1>{{ user.name }}'s Profile</h1>
-    <table>
+    <table class="profile-info">
       <tr>
         <th>Total Packages: {{ user.total_packages }}</th>
         <th>Total Miles Delivered: {{ user.total_miles }}</th>
@@ -41,7 +45,7 @@
 				<th>{{ p.origin }}</th>
 				<th>{{ p.destination }}</th>
 				<th>{{ p.transportation }}</th>
-				<th>{{ p.carbon }} kg</th>
+				<th>{{ p.carbon }} kgCo2</th>
 			</tr>
 		{% endfor %}
 		</table>

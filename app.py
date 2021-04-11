@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request
 import json
 
+import gmail
+from database import table
+
 app = Flask(__name__)
 
 
@@ -15,6 +18,8 @@ def test():
 @app.route('/profile', methods=['GET'])
 def profile():
     #  takes a user json
+    userid = request.headers['userid']
+
     usr="""{
     "id": "110110", 
     "name": "Thomas", 
@@ -72,16 +77,20 @@ def profile():
 
     return render_template('profile.html', user=json.loads(usr), packages=json.loads(pkg))
 
-@app.route('/profile/packages')
-def moreinfo(): 
+@app.route('/loading')
+def load(): 
     # query all package information
     # list chronologically in table
 
     # get json data 
-    return render_template('packages.html', data=dta)
+    return render_template('loading.html')
 
-# @app.route('/login')
-# def login(): 
+@app.route('/login')
+def login(): 
+    usr = gmail.get_tracking_numbers()
+    table.add
+    return redirect(url_for('login'))
+
 # if user exists, just scrape
 # otherwise, add
 

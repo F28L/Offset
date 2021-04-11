@@ -1,6 +1,10 @@
 
+
 table {
     width: 100%;
+}
+
+.packages {
     border-collapse: separate;
     border-spacing: 0 15px;
 }
@@ -20,4 +24,26 @@ th {
 
 .th {
     margin: 0;
+}
+
+#logo-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+#logo-container img {
+    display: block;
+    margin: auto;
+    width: 200px;
+}
+
+.profile-info th {
+    background-color: var(--primary);
+    color: var(--background);
+    padding: 50px;
+}
+
+.profile-info {
+    border-collapse: separate;
+    border-spacing: 50px;
 }
