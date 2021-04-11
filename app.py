@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import json
 
-import gmail
+from utils import gmail, carbon_calculator, package_parser
 from database import table
 
 app = Flask(__name__)
@@ -92,7 +92,7 @@ def login():
     table.add_user(conn, usr.name, usr.email)
 
     
-    
+
     conn.close()
     return redirect(url_for('login'))
 
