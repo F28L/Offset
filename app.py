@@ -88,7 +88,12 @@ def load():
 @app.route('/login')
 def login(): 
     usr = gmail.get_tracking_numbers()
-    table.add
+    conn = table.open_connection()
+    table.add_user(conn, usr.name, usr.email)
+
+    
+    
+    conn.close()
     return redirect(url_for('login'))
 
 # if user exists, just scrape

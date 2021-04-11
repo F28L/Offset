@@ -2,6 +2,9 @@ import sqlite3
 import json
 from sqlite3 import Error
 
+def open_connection(): 
+    return create_connection('offsetlite.db')
+
 def create_connection(db_file):
     """ create a database connection to a SQLite database """
     conn = None
