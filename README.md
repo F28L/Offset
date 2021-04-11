@@ -21,3 +21,7 @@ How to interact with APIs and build a SQL Database. We also learned how to use F
 
 ## What's next for Offset
 We want to find a better API than ShipEngine to get better package data. We also want to add better resources to truly offset our carbon footprint. The main goal was to redirect the user to pages that allowed the user to buy trees that would be planted, but we were unable to add this to the website in time.
+
+## Links
+[Demo](https://www.youtube.com/watch?v=6jMwL1DJUro)
+[DevPost](https://devpost.com/software/offset-fqmtug)
