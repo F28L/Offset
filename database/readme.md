@@ -1,3 +1,14 @@
+# Database Methods
+
+``` python 
+
+import table
+
+
+```
+
+
+# Database Table Specifications
 ## Users Table
 * id : Unique id
 * name : user's name
@@ -8,18 +19,18 @@
 
 ## Packages Tables
 * id : Unique id
+* email: Email of the user
 * user_id : Unique id of the user this package belongs to
 * tracking : Tracking number of the package
 * weight : weight of the package
-* weight_unit : Unit of weight for the package
-* dimension_unit : Unit of dimensions for package
 * length : Length of package
 * width : Width of package
 * height : Height of package  
 * volume : volume of the package
 * origin : Where the package is being shipped from
-* ship_date : When the package was shipped
+* ship_date : When the package was shipped (YYY-MM-DD)
 * destination : Where the package is being shipped to
+* distance : Distance the package traveled
 * transportation : Type of transportation the package is using (road, plane, etc)
 * carbon : carbon output of table
 

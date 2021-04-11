@@ -1,4 +1,5 @@
 import sqlite3
+import json
 from sqlite3 import Error
 
 def create_connection(db_file):
@@ -18,6 +19,78 @@ def create_table(conn, create_table_sql):
     except Error as e:
         print(e)
 
+def add_user(conn, name, email):
+    try:
+        c = conn.cursor()
+        values = (name, email)
+        sql = ''' INSERT INTO users(name,email) VALUES(?,?) '''
+        c.execute(sql,values)
+        conn.commit()
+    except Error as e:
+        print(e)
+
+def update_user(conn, email):
+    try:
+        c = conn.cursor()
+        values = (email,)
+        sql = '''UPDATE users SET total_carbon = (SELECT SUM(carbon) FROM packages WHERE email = ? ) '''
+        sql2 = '''UPDATE users SET total_miles = (SELECT SUM(distance) FROM packages WHERE email = ? ) '''
+        sql3 = '''UPDATE users SET total_packages = (SELECT COUNT(carbon) FROM packages WHERE email = ? )'''
+        c.execute(sql,values)
+        c.execute(sql2,values)
+        c.execute(sql3,values)
+        conn.commit()
+    except Error as e:
+        print(e)
+
+def get_user(conn, email):
+    try:
+        c = conn.cursor()
+        values = (email,)
+        sql = ''' SELECT * FROM users where email = ?'''
+        c.execute(sql,values)
+        data = c.fetchall()
+        names = list(map(lambda x: x[0], c.description))
+        dic = {names[i]: data[0][i] for i in range(len(names))}
+        return dic
+    except Error as e:
+        print(e)
+
+def get_packages(conn, email):
+    try:
+        c = conn.cursor()
+        values = (email,)
+        sql = ''' SELECT * FROM packages where email = ?'''
+        c.execute(sql,values)
+        data = c.fetchall()
+        names = list(map(lambda x: x[0], c.description))
+        dic = {names[i]: data[0][i] for i in range(len(names))}
+        return dic
+    except Error as e:
+        print(e)
+
+def add_package(conn, email, tracking, weight, length, 
+                width, height, volume, origin, ship_date, destination, 
+                distance, transportation, carbon):
+    try:
+        c = conn.cursor()
+        values = (email,)
+        sql = ''' SELECT id FROM users where email = ?'''
+        c.execute(sql,values)
+        key = c.fetchall()
+        values = (email, key[0][0], tracking, weight, length, 
+                width, height, volume, origin, ship_date, destination, 
+                distance, transportation, carbon)
+        sql = ''' INSERT INTO packages(email,user_id,tracking,weight,
+                length,width,height,volume, origin, ship_date, destination, 
+                distance, transportation, carbon) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
+        c.execute(sql,values)
+        conn.commit()
+    except Error as e:
+        print(e)
+
+### Not Important ###
+
 def main():
     database = "offsetlite.db"
 
@@ -34,11 +107,10 @@ def main():
     # date of shipment, destination(ship to address), transportation( Type of shipment road, air,etc), calculated carbon  
     package_table = """ CREATE TABLE IF NOT EXISTS packages (
                                         id integer PRIMARY KEY,
+                                        email text,
                                         user_id integer,
                                         tracking integer,
                                         weight real,
-                                        weight_unit text,
-                                        dimension_unit,
                                         length real,
                                         width real,
                                         height real,
@@ -46,6 +118,7 @@ def main():
                                         origin text,
                                         ship_date text,
                                         destination text,
+                                        distance real,
                                         transportation text,
                                         carbon real,
                                         FOREIGN KEY (user_id) REFERENCES users (id)
@@ -55,8 +128,14 @@ def main():
     if conn is not None:
         create_table(conn, user_table)
         create_table(conn, package_table)
+        # #add_user(conn, "Thomas Giewont", "tmgiewont@gmail.com")
+        # add_package(conn, "tmgiewont@gmail.com", 69, 10, 2,2,2, 8, "Albany, New York", "2021-04-10", "College Park, Maryland", 250, "road", 69)
+        # add_package(conn, "tmgiewont@gmail.com", 69, 10, 2,2,2, 8, "Albany, New York", "2021-04-10", "College Park, Maryland", 10, "road", 69)
+        # #update_user(conn, "tmgiewont@gmail.com")
+        # print(get_user(conn,"tmgiewont@gmail.com"))
+        # print(get_packages(conn, "tmgiewont@gmail.com"))
     else:
-        print("You fucked up")
+        print("You messed up")
 
 if __name__ == '__main__':
     main()
