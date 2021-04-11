@@ -2,14 +2,13 @@
 
 ``` python 
 
-import table
 
 #Returns a connection to the database when you provide it the proper file location
-conn = table.create_connection("offsetlite.db") 
+conn = tcreate_connection("offsetlite.db") 
 
 #Adds a user to the table need the name and email of the user
 #Name is not important email must be the email used with all packages
-table.add_user(conn,name,email)
+add_user(conn,name,email)
 
 #Updates the user's total carbon, total miles, and total packages
 #Should use once all the packages have been added to the database
