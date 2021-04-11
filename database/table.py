@@ -12,6 +12,14 @@ def create_connection(db_file):
         print(e)
     return conn
 
+def clear(conn):
+    try:
+        c = conn.cursor()
+        c.execute("DROP TABLE users")
+        c.execute("DROP TABLE packages")
+    except Error as e:
+        print(e)
+
 def create_table(conn, create_table_sql):
     try:
         c = conn.cursor()
@@ -64,8 +72,11 @@ def get_packages(conn, email):
         c.execute(sql,values)
         data = c.fetchall()
         names = list(map(lambda x: x[0], c.description))
-        dic = {names[i]: data[0][i] for i in range(len(names))}
-        return dic
+        ret = []
+        for x in range(len(data)):
+            dic = {names[i]: data[x][i] for i in range(len(names))}
+            ret.append(dic)
+        return ret
     except Error as e:
         print(e)
 
@@ -109,7 +120,7 @@ def main():
                                         id integer PRIMARY KEY,
                                         email text,
                                         user_id integer,
-                                        tracking integer,
+                                        tracking text,
                                         weight real,
                                         length real,
                                         width real,
@@ -128,12 +139,6 @@ def main():
     if conn is not None:
         create_table(conn, user_table)
         create_table(conn, package_table)
-        # #add_user(conn, "Thomas Giewont", "tmgiewont@gmail.com")
-        # add_package(conn, "tmgiewont@gmail.com", 69, 10, 2,2,2, 8, "Albany, New York", "2021-04-10", "College Park, Maryland", 250, "road", 69)
-        # add_package(conn, "tmgiewont@gmail.com", 69, 10, 2,2,2, 8, "Albany, New York", "2021-04-10", "College Park, Maryland", 10, "road", 69)
-        # #update_user(conn, "tmgiewont@gmail.com")
-        # print(get_user(conn,"tmgiewont@gmail.com"))
-        # print(get_packages(conn, "tmgiewont@gmail.com"))
     else:
         print("You messed up")
 
