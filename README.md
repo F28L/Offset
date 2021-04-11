@@ -28,7 +28,3 @@ We want to find a better API than ShipEngine to get better package data. We also
 ## Links
 [Demo](https://www.youtube.com/watch?v=6jMwL1DJUro)
 [DevPost](https://devpost.com/software/offset-fqmtug)
-
-## Links
-[Demo](https://www.youtube.com/watch?v=6jMwL1DJUro)
-[DevPost](https://devpost.com/software/offset-fqmtug)
