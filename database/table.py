@@ -29,11 +29,38 @@ def add_user(conn, name, email):
     except Error as e:
         print(e)
 
+def update_user(conn, email):
+    try:
+        c = conn.cursor()
+        values = (email,)
+        sql = '''UPDATE users SET total_carbon = (SELECT SUM(carbon) FROM packages WHERE email = ? ) '''
+        sql2 = '''UPDATE users SET total_miles = (SELECT SUM(distance) FROM packages WHERE email = ? ) '''
+        sql3 = '''UPDATE users SET total_packages = (SELECT COUNT(carbon) FROM packages WHERE email = ? )'''
+        c.execute(sql,values)
+        c.execute(sql2,values)
+        c.execute(sql3,values)
+        conn.commit()
+    except Error as e:
+        print(e)
+
 def get_user(conn, email):
     try:
         c = conn.cursor()
         values = (email,)
         sql = ''' SELECT * FROM users where email = ?'''
+        c.execute(sql,values)
+        data = c.fetchall()
+        names = list(map(lambda x: x[0], c.description))
+        dic = {names[i]: data[0][i] for i in range(len(names))}
+        return dic
+    except Error as e:
+        print(e)
+
+def get_packages(conn, email):
+    try:
+        c = conn.cursor()
+        values = (email,)
+        sql = ''' SELECT * FROM packages where email = ?'''
         c.execute(sql,values)
         data = c.fetchall()
         names = list(map(lambda x: x[0], c.description))
@@ -61,6 +88,8 @@ def add_package(conn, email, tracking, weight, length,
         conn.commit()
     except Error as e:
         print(e)
+
+### Not Important ###
 
 def main():
     database = "offsetlite.db"
@@ -99,11 +128,14 @@ def main():
     if conn is not None:
         create_table(conn, user_table)
         create_table(conn, package_table)
-        add_user(conn, "Thomas Giewont", "tmgiewont@gmail.com")
-        add_package(conn, "tmgiewont@gmail.com", 69, 10, 2,2,2, 8, "Albany, New York", "2021-04-10", "College Park, Maryland", 250, "road", 69)
-        #print(get_user(conn,"tmgiewont@gmail.com"))
+        # #add_user(conn, "Thomas Giewont", "tmgiewont@gmail.com")
+        # add_package(conn, "tmgiewont@gmail.com", 69, 10, 2,2,2, 8, "Albany, New York", "2021-04-10", "College Park, Maryland", 250, "road", 69)
+        # add_package(conn, "tmgiewont@gmail.com", 69, 10, 2,2,2, 8, "Albany, New York", "2021-04-10", "College Park, Maryland", 10, "road", 69)
+        # #update_user(conn, "tmgiewont@gmail.com")
+        # print(get_user(conn,"tmgiewont@gmail.com"))
+        # print(get_packages(conn, "tmgiewont@gmail.com"))
     else:
-        print("You fucked up")
+        print("You messed up")
 
 if __name__ == '__main__':
     main()

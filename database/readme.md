@@ -1,3 +1,14 @@
+# Database Methods
+
+``` python 
+
+import table
+
+
+```
+
+
+# Database Table Specifications
 ## Users Table
 * id : Unique id
 * name : user's name
