@@ -33,7 +33,10 @@ def getDetails(carrier, tracking):
 
     r = requests.get(url, headers=headers, params=qs)
     j = r.json()
+    result = None
 
+
+    print(f'LUCAS {carrier}')
     if carrier == 'ups':
         if j['carrier_status_description'] != "Invalid tracking number":
             firstevent = j['events'][-2] # First event is label printing, need to grab origin scan.

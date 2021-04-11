@@ -92,7 +92,7 @@ def add_package(conn, email, tracking, weight, length,
                 distance, transportation, carbon):
     try:
         c = conn.cursor()
-        values = (tracking, email weight, length, 
+        values = (tracking, email, weight, length, 
                 width, height, volume, origin, ship_date, destination, 
                 distance, transportation, carbon)
         sql = ''' INSERT INTO packages(tracking,email,weight,
@@ -108,7 +108,7 @@ def add_packages(conn, email, packages):
     try:
         c = conn.cursor()
         for p in packages: 
-            values = (p['tracking'], p['email'] p['weight'], p['length'], 
+            values = (p['tracking'], p['email'], p['weight'], p['length'], 
                     p['width'], p['height'], p['volume'], p['origin'], p['ship_date'], p['destination'], 
                     p['distance'], p['transportation'], p['carbon'])
             sql = ''' INSERT INTO packages(tracking,email,weight,

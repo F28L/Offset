@@ -1,13 +1,10 @@
-# To add a new cell, type '# %%'
-# To add a new markdown cell, type '# %% [markdown]'
-
-
 from __future__ import print_function
 import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+
 
 # import the required libraries
 from googleapiclient.discovery import build
@@ -23,27 +20,39 @@ from bs4 import BeautifulSoup
 # Define the SCOPES. If modifying it, delete the token.pickle file.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
-# https://stackoverflow.com/questions/619977/regular-expression-patterns-for-tracking-numbers 
-matchUPS1      = '/\b(1Z ?[0-9A-Z]{3} ?[0-9A-Z]{3} ?[0-9A-Z]{2} ?[0-9A-Z]{4} ?[0-9A-Z]{3} ?[0-9A-Z]|[\dT]\d\d\d ?\d\d\d\d ?\d\d\d)\b/'
-matchUPS2      = '/^[kKJj]{1}[0-9]{10}$/'
+def grab_tracking_number(body):
+    number_set = set()
+    usps = '([A-Z]{2}\d{9}[A-Z]{2}|(420\d{9}(9[2345])?)?\d{20}|(420\d{5})?(9[12345])?(\d{24}|\d{20})|82\d{8})'
+    ups = '(1Z[A-H,J-N,P,R-Z,0-9]{16})'
+    fedex = '\D([0-9]{12}|100\d{31}|\d{15}|\d{18}|96\d{20}|96\d{32})\D'
 
-matchUSPS0     = '/(\b\d{30}\b)|(\b91\d+\b)|(\b\d{20}\b)/'
-matchUSPS1     = '/(\b\d{30}\b)|(\b91\d+\b)|(\b\d{20}\b)|(\b\d{26}\b)| ^E\D{1}\d{9}\D{2}$|^9\d{15,21}$| ^91[0-9]+$| ^[A-Za-z]{2}[0-9]+US$/i'
-matchUSPS2     = '/^E\D{1}\d{9}\D{2}$|^9\d{15,21}$/'
-matchUSPS3     = '/^91[0-9]+$/'
-matchUSPS4     = '/^[A-Za-z]{2}[0-9]+US$/'
-matchUSPS5     = '/(\b\d{30}\b)|(\b91\d+\b)|(\b\d{20}\b)|(\b\d{26}\b)| ^E\D{1}\d{9}\D{2}$|^9\d{15,21}$| ^91[0-9]+$| ^[A-Za-z]{2}[0-9]+US$/i'
+    pattern = re.compile(f'{usps}|{ups}|{fedex}')
+    fedex_pattern = re.compile(fedex)
+    usps_pattern = re.compile(usps)
+    ups_pattern = re.compile(ups)
+    
+    existing = set()
+    
+    match = re.search(pattern, body)
+    if fedex_pattern.match(match[0]):
+        number = re.sub("[^0-9]", "", match[0])
+        if number not in existing:
+            number_set.add(('fedex', number))
+            existing.add(number)
+    elif usps_pattern.match(match[0]) and match[0] not in existing:
+        if '2106' == match[0][0:4]:
+            number_set.add(('ups', match[0]))
+        else:
+            number_set.add(('usps', match[0]))
+        existing.add(match[0])
+    elif ups_pattern.match(match[0]) and match[0] not in existing:
+        number_set.add(('ups', match[0]))
+        existing.add(match[0])
 
-matchFedex1    = '/(\b96\d{20}\b)|(\b\d{15}\b)|(\b\d{12}\b)/'
-matchFedex2    = '/\b((98\d\d\d\d\d?\d\d\d\d|98\d\d) ?\d\d\d\d ?\d\d\d\d( ?\d\d\d)?)\b/'
-matchFedex3    = '/^[0-9]{15}$/'
+    return number_set
 
-possible_tracking_numbers_regex = [matchUPS1, matchUPS2, matchUSPS0, matchUSPS1, matchUSPS2, matchUSPS3, matchUSPS4, matchUSPS5, matchFedex1, matchFedex2, matchFedex3]
-
-
-tracking_numbers = []
-
-def getEmails():
+def getDataFromEmailInbox():
+    data_dict = dict()
     # Variable creds will store the user access token.
     # If no valid token found, we will create one.
     creds = None
@@ -63,7 +72,7 @@ def getEmails():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-            creds = flow.run_local_server(port=8080)
+            creds = flow.run_local_server(port=55160)
 
         # Save the access token in token.pickle file for the next run
         with open('token.pickle', 'wb') as token:
@@ -74,20 +83,25 @@ def getEmails():
 
     # request a list of all the messages
     # result = service.users().messages().list(userId='me').execute()
-    
+    profile = service.users().getProfile(userId = 'me').execute()
+
+    # print(profile['emailAddress'].replace('@gmail.com', ''))
+    data_dict['name'] = profile['emailAddress'].replace('@gmail.com', '')
+    data_dict['email'] = profile['emailAddress']
+
     # # We can also pass maxResults to get any number of emails. Like this:
     result = service.users().messages().list(maxResults=10000, userId='me', q ='"tracking number"').execute()
     messages = result.get('messages')
 
     # messages is a list of dictionaries where each dictionary contains a message id.
     # iterate through all the messages
+    packages = list()
     for msg in messages:
         # Get the message from its id
         txt = service.users().messages().get(userId='me', id=msg['id']).execute()
         
         # Use try-except to avoid any Errors
         try:
-            # print(txt)
             # Get value of 'payload' from dictionary 'txt'
             payload = txt['payload']
             headers = payload['headers']
@@ -99,36 +113,24 @@ def getEmails():
                     # tracking_numbers.append(subject)
                 if d['name'] == 'From':
                     sender = d['value']
-
+            
             # The Body of the message is in Encrypted format. So, we have to decode it.
             # Get the data and decode it with base 64 decoder.
-            parts = payload.get('parts')[0]
-            data = parts['body']['data']
+            # print(payload['parts'][0])
+            if 'parts' not in payload.keys():
+                data = payload['body']['data']
+            else:
+                data = payload['parts'][0]['body']['data']
+            
             data = data.replace("-","+").replace("_","/")
             decoded_data = base64.b64decode(data)
 
-            # Now, the data obtained is in lxml. So, we will parse
-            # it with BeautifulSoup library
-            soup = BeautifulSoup(decoded_data , "lxml")
-            body = soup.body()
+            res = list(grab_tracking_number(decoded_data.decode("utf-8")))
+            packages += res
 
-            ps = soup.find_all('p')
-            As = [x.find_all('a') for x in list(ps)]
-            nums = []
-            for x in possible:
-                print(x)
-            # Printing the subject, sender's email and message
-            # print("Subject: ", subject)
-            # print("From: ", sender)
-            # print("Message: ", body)
-            # print('\n')
-        except:
+        except Exception as e:
+            print(e, 'error')
             pass
-
-getEmails()
-
-# returns the tracking numbers in an array
-# also returns user email, name
-# dict format
-def get_user_info(): 
-    return getEmails()
+        
+    data_dict['packages'] = list(set(packages))
+    return data_dict

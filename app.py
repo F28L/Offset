@@ -3,7 +3,7 @@ import json
 
 import math
 
-from utils import gmail, carbon_calculator, package_parser, shipengine
+from utils import gmail, carbon_calculator, shipengine
 from database import table
 
 app = Flask(__name__)
@@ -26,62 +26,9 @@ def profile():
     usr = table.get_user(conn, userid)
     pkg = table.get_packages(conn, userid)
 
-    usr="""{
-    "id": "110110", 
-    "name": "Thomas", 
-    "email": "tvarano@umd.edu", 
-    "total_packages": 25, 
-    "total_carbon": 101, 
-    "total_miles": 1000
-    }"""
+    conn.close()
 
-    pkg="""[{
-    "id": "100100", 
-    "user_id": "100100", 
-    "tracking": "100100", 
-    "weight": 10.2, 
-    "length": 0.5, 
-    "width": 0.5, 
-    "height": 0.5, 
-    "volume": 0.125, 
-    "origin": "New York City, NY", 
-    "ship_date": "2020-11-05", 
-    "destination": "Seoul, South Korea", 
-    "transportation": "plane", 
-    "carbon": 102
-    }, 
-    {
-    "id": "100100", 
-    "user_id": "100100", 
-    "tracking": "100100", 
-    "weight": 10.2, 
-    "length": 0.5, 
-    "width": 0.5, 
-    "height": 0.5, 
-    "volume": 0.125, 
-    "origin": "New York City, NY", 
-    "ship_date": "2020-11-05", 
-    "destination": "Seoul, South Korea", 
-    "transportation": "plane", 
-    "carbon": 102
-    }, 
-    {
-    "id": "100100", 
-    "user_id": "100100", 
-    "tracking": "100100", 
-    "weight": 10.2, 
-    "length": 0.5, 
-    "width": 0.5, 
-    "height": 0.5, 
-    "volume": 0.125, 
-    "origin": "New York City, NY", 
-    "ship_date": "2020-11-05", 
-    "destination": "Seoul, South Korea", 
-    "transportation": "plane", 
-    "carbon": 102
-    }]"""
-
-    return render_template('profile.html', user=json.loads(usr), packages=json.loads(pkg))
+    return render_template('profile.html', user=usr, packages=pkg)
 
 @app.route('/loading')
 def load(): 
@@ -93,16 +40,19 @@ def load():
 
 @app.route('/login')
 def login(): 
-    usr = gmail.get_tracking_numbers()
+    gmuser = gmail.getDataFromEmailInbox()
     conn = table.open_connection()
     
-    usr = table.get_user(conn, user.email)
-    if not usr: 
-        table.add_user(conn, usr['name'], usr['email'])
+    user = table.get_user(conn, gmuser['email'])
+    if not user : 
+        table.add_user(conn, gmuser['name'], gmuser['email'])
     
     # get package info
-    for (carrier, track) in usr['packages']: 
+    for (carrier, track) in gmuser['packages']: 
         details = shipengine.getDetails(carrier, track)
+        if not details: 
+            continue
+        
         breakdown = carbon_calculator.shortestRoute(coord_str(details['origin']), coord_str(details['destination']))
         # kg, cbm = dummy
         kg = 2
@@ -110,7 +60,7 @@ def login():
         lwh = math.sqrt(cmb)
         carbon = carbon_calculator.getCO2(coord_str(details['origin']), coord_str(details['destination']), breakdown, kg, cbm)
 
-        table.add_package(conn, usr['email'], track, kg, lwh, lwh, lwh, cbm, f"{details['origin']['city']}, {details['origin']['state']}", '2021-11-04', f"{details['destination']['city']}, {details['destination']['state']}", breakdown['distance'], 'road', carbon)
+        table.add_package(conn, user['email'], track, kg, lwh, lwh, lwh, cbm, f"{details['origin']['city']}, {details['origin']['state']}", '2021-11-04', f"{details['destination']['city']}, {details['destination']['state']}", breakdown['distance'], 'road', carbon)
         
 
     conn.close()
