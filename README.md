@@ -1,3 +1,12 @@
+## Contributors
+Sandeep Ramesh- I designed the backend of the project, specifically dealing with the Gmail API and setting up the 0Auth2 Flow, querying the emails, and parsing them for tracking numbers.
+
+Lucas Stuart- I designed the logo and color palette, then worked on the backend. I wrote the part that calculated carbon output given an origin and destination, and also contributed on the tracking API implementation.
+
+Thomas Varano- I designed the backend and coordinated to combine all the work my collaborators did into one cohesive project. I also wrote the front end and connected the two.
+
+Thomas Giewont- I designed the SQL database. I wrote multiple different methods involving SQL queries so that the other team members can easily access and modify the database.
+
 ## Inspiration
 Every day, Amazon ships over a 1.6million packages a day, and this number is only rising. We use services like Amazon and other delivery services, ignoring the impact they have on the environment. We wanted to help society realize its true carbon footprint by showing them its shopping carbon footprint.
 
