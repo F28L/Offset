@@ -58,6 +58,8 @@ def get_user(conn, email):
         sql = ''' SELECT * FROM users where email = ?'''
         c.execute(sql,values)
         data = c.fetchall()
+        if(len(data) == 0):
+            return None
         names = list(map(lambda x: x[0], c.description))
         dic = {names[i]: data[0][i] for i in range(len(names))}
         return dic
@@ -71,6 +73,8 @@ def get_packages(conn, email):
         sql = ''' SELECT * FROM packages where email = ?'''
         c.execute(sql,values)
         data = c.fetchall()
+        if(len(data) == 0):
+            return None
         names = list(map(lambda x: x[0], c.description))
         ret = []
         for x in range(len(data)):
@@ -139,6 +143,11 @@ def main():
     if conn is not None:
         create_table(conn, user_table)
         create_table(conn, package_table)
+        #clear(conn)
+        #add_user(conn, "Thomas", "tmgiewont@gmail.com")
+        #add_package(conn, "tmgiewont@gmail.com", "1234", 5, 2,2,2,8,"New York","2020-04-10","Maryland",200, "road", 80)
+        #get_user(conn, "tgiewont")
+        #get_packages(conn, "thog")
     else:
         print("You messed up")
 
